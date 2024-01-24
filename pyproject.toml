@@ -11,6 +11,11 @@ fastapi = "^0.109.0"
 uvicorn = "^0.27.0"
 
 
+[[tool.poetry.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "default"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
