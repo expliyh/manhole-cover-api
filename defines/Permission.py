@@ -1,0 +1,16 @@
+from enum import Enum
+
+
+class Permission(Enum):
+    SYSTEM_ADMIN = 1
+    READ_USER = 2
+    READ_WRITE_USER = 3
+    READ_COVER_LIST = 4
+    READ_WRITE_COVER_LIST = 5
+    READ_COVER = 6
+    READ_WRITE_COVER = 7
+    READ_PICTURE = 8
+    READ_WRITE_PICTURE = 9
+    WRITE_PICTURE = 10
+    READ_GROUP = 11
+    READ_WRITE_GROUP = 12
