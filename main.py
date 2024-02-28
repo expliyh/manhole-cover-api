@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile
 
+from request_models.GetCoverListOptions import GetCoverListOptions
+
 app = FastAPI()
 
 
@@ -15,19 +17,20 @@ async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
 
-# BEGIN RESTFUL API
-
-
-@app.post("/api/picture")
+@app.post("/api/picture/add")
 async def new_picture(
         picture: UploadFile,
         longitude: float,
-        latitude: float
 ):
     return {"message": "TODO: Return Picture ID"}
 
 
-# BEGIN OTHER API
+@app.post("/api/cover-list/get")
+async def get_cover_list(
+        options: GetCoverListOptions
+):
+    pass
+
 
 @app.post("/api/position/get-formatted")
 async def get_position_string(
