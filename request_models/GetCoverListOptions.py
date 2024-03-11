@@ -1,7 +1,9 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
-class SortOption:
+class SortOption(BaseModel):
     """
     排序选项
     """
@@ -9,7 +11,7 @@ class SortOption:
     order: str
 
 
-class FilterOption:
+class FilterOption(BaseModel):
     """
     过滤选项
     """
@@ -25,5 +27,5 @@ class GetCoverListOptions(BaseModel):
     """
     rows_per_page: int
     first: int
-    filter_by: [FilterOption] = []
-    sort_by: [SortOption] = []
+    filter_by: List[FilterOption] = []
+    sort_by: List[SortOption] = []

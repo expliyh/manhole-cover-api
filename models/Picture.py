@@ -1,13 +1,14 @@
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, JSON
+from sqlalchemy import Column, Integer, String, JSON, Text
 
 from .ModelBase import model_base
 
 
 class Picture(model_base):
     __tablename__ = 'pictures'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     latitude = Column(Integer)
     longitude = Column(Integer)
-    url = Column(String)
+    position_format = Column(Text)
+    url = Column(Text)

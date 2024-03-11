@@ -2,6 +2,10 @@ from fastapi import FastAPI, UploadFile
 
 from request_models.GetCoverListOptions import GetCoverListOptions
 
+from models import create_database
+
+create_database()
+
 app = FastAPI()
 
 
