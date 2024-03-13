@@ -3,4 +3,7 @@ from .Cover import Cover
 from .Group import Group
 from .Picture import Picture
 from .User import User
-from .engine import Engine,create_database
+from .engine import Engine, create_database
+from . import (
+    picture_regiesry
+)

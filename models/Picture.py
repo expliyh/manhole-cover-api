@@ -11,4 +11,4 @@ class Picture(model_base):
     latitude = Column(Integer)
     longitude = Column(Integer)
     position_format = Column(Text)
-    url = Column(Text)
+    url = Column(Text, nullable=True)
