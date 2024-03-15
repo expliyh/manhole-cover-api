@@ -8,12 +8,13 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.110.0"
-uvicorn = "^0.27.0"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
+uvicorn = "^0.28.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.28"}
 mariadb = "^1.1.9"
 asyncmy = "^0.2.9"
 python-multipart = "^0.0.9"
 aiohttp = "^3.9.2"
+pyjwt = "^2.8.0"
 
 
 [[tool.poetry.source]]

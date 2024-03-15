@@ -7,11 +7,10 @@ from .engine import engine
 
 
 async def add_picture(pic: Picture) -> int:
-    async with engine.new_session() as session:
-        session: AsyncSession = session
-        session.add(pic)
-        await session.commit()
-        return pic.id
+    if pic.position_format is None:
+        # TODO: 获取格式化的地址
+        pass
+    return await engine.add(pic)
 
 
 async def get_picture(pid: int) -> Picture | None:
