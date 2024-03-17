@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Header
 
 from config import get_uid_from_token
 from models.user_registry import get_user_by_id
+from models import group_registry
 from request_models.GetCoverListOptions import GetCoverListOptions
 import services
 
@@ -21,6 +22,8 @@ async def get_cover_list(
         raise HTTPException(status_code=400, detail="Too many rows requested")
     uid = get_uid_from_token(token)
     user = await get_user_by_id(uid)
-    # TODO: 检查用户权限
+    group = await group_registry.get_group_by_id(user.group_id)
+    if not group.p_list_cover:
+        raise HTTPException(status_code=403, detail="Permission denied")
     return await services.list_cover(options)
     pass
