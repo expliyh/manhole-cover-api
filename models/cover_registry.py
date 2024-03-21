@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import select, func
+from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from request_models.GetCoverListOptions import *
@@ -73,3 +73,10 @@ async def count(options: GetCoverListOptions) -> int:
         session: AsyncSession = session
         result = await session.execute(statement)
         return result.scalar()
+
+
+async def update_url(cid: int, url: str):
+    async with engine.new_session() as session:
+        session: AsyncSession = session
+        await session.execute(update(Cover).where(Cover.id == cid).values(url=url))
+    return

@@ -20,7 +20,7 @@ class Cover(model_base):
     recognizeTime = Column(DateTime)
     uploadUser = Column(Integer, ForeignKey('users.id'))
     editCount = Column(Integer)
-    url = Column(Text)
+    url = Column(Text, nullable=True)
 
     def __repr__(self):
         return f"<Cover(latitude={self.latitude}, longitude={self.longitude}, url={self.url})>"

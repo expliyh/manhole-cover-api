@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "manhole-cover-api"
-version = "0.1.0"
+version = "0.1.0.00.001"
 description = ""
 authors = ["Expliyh <expliyh@outlook.com>"]
 readme = "README.md"
@@ -15,12 +15,17 @@ asyncmy = "^0.2.9"
 python-multipart = "^0.0.9"
 aiohttp = "^3.9.2"
 pyjwt = "^2.8.0"
+requests = "^2.31.0"
 
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "supplemental"
 
 [[tool.poetry.source]]
 name = "mirrors"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "default"
+priority = "primary"
 
 [build-system]
 requires = ["poetry-core"]

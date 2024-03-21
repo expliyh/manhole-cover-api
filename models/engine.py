@@ -19,15 +19,15 @@ class Engine:
         pass
 
     async def create_all(self):
-        async with self.eg.begin as conn:
+        async with self.eg.begin() as conn:
             conn: AsyncConnection = conn
             await conn.run_sync(model_base.metadata.create_all)
 
-    async def new_session(self) -> async_sessionmaker[AsyncSession]:
-        return async_sessionmaker(self.eg, expire_on_commit=True)
+    def new_session(self) -> AsyncSession:
+        return async_sessionmaker(self.eg, expire_on_commit=True)()
 
     async def add(self, obj) -> int:
-        async with async_sessionmaker(self.eg, expire_on_commit=False) as session:
+        async with async_sessionmaker(self.eg, expire_on_commit=False)() as session:
             session: AsyncSession = session
             session.add(obj)
             await session.commit()

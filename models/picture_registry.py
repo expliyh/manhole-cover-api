@@ -25,4 +25,5 @@ async def update_url(pid: int, url: str):
     async with engine.new_session() as session:
         session: AsyncSession = session
         await session.execute(update(Picture).where(Picture.id == pid).values(url=url))
+        await session.commit()
     return

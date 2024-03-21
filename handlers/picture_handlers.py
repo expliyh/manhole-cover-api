@@ -1,9 +1,11 @@
 import os
 
-from fastapi import UploadFile, APIRouter, HTTPException
+from fastapi import UploadFile, APIRouter, HTTPException, File, Form
 import decimal
 
-from services import upload_picture
+from services import upload_picture, get_picture
+
+from request_models.UploadPictureRequest import UploadPictureRequest
 
 import config
 
@@ -12,10 +14,10 @@ router = APIRouter()
 
 @router.post("/api/picture/add")
 async def upload_picture_handler(
-        latitude: str,
-        longitude: str,
-        position_format: str,
-        picture: UploadFile
+        latitude: str = Form(),
+        longitude: str = Form(),
+        position_format: str = Form(),
+        picture: UploadFile = File()
 ):
     lat = decimal.Decimal(latitude)
     lon = decimal.Decimal(longitude)
@@ -24,12 +26,20 @@ async def upload_picture_handler(
     if lat > 90 or lat < -90:
         raise HTTPException(status_code=400, detail="Invalid latitude")
     # TODO: 检查 position_format 是否合法
-    ext = os.path.splitext(picture.filename)[-1]
+    ext = os.path.splitext(picture.filename)[-1][1:]
     if ext not in config.allow_picture_exts:
-        raise HTTPException(status_code=415, detail="Invalid file type")
+        raise HTTPException(status_code=415, detail=f"Invalid file type {ext}")
     return await upload_picture(
         latitude=lat,
         longitude=lon,
         position_format=position_format,
         picture=picture
     )
+
+
+@router.post("/api/picture/get")
+async def get_picture_handler(
+        pid: int
+):
+    return await get_picture(pid)
+    pass

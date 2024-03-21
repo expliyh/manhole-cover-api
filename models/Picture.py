@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, JSON, Text, DECIMAL
+from sqlalchemy import Column, Integer, String, JSON, Text, DECIMAL, DateTime, ForeignKey
 
 from .ModelBase import model_base
 
@@ -11,4 +11,6 @@ class Picture(model_base):
     latitude = Column(DECIMAL(9, 6))
     longitude = Column(DECIMAL(9, 6))
     position_format = Column(Text)
+    uploadTime = Column(DateTime)
+    upload_user = Column(Integer, ForeignKey('users.id'))
     url = Column(Text, nullable=True)
