@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from request_models.GetCoverListOptions import *
+from request_models.GetCoverListOptions import GetCoverListOptions
 
 from .engine import engine
 from .Cover import Cover
