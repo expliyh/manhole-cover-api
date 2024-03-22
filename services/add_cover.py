@@ -4,6 +4,7 @@ import datetime
 from fastapi import UploadFile
 
 import config
+from defines import PictureStatus
 from models import Cover, picture_registry, cover_registry
 from models.engine import engine
 
@@ -35,6 +36,7 @@ async def add_cover(pid: int, file: bytes, status: str) -> int:
 
 
 async def fake_recognize(pid: int, file: bytes):
-    await asyncio.sleep(10)
+    await asyncio.sleep(5)
     cid = await add_cover(pid, file, "井盖完好")
+    await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)
     return

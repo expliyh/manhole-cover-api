@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import HTTPException, Header, APIRouter
 
 from config import get_uid_from_token
 from models.user_registry import get_user_by_id

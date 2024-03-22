@@ -57,6 +57,17 @@ async def list_covers(options: GetCoverListOptions) -> list[Cover]:
     return cover_list
 
 
+async def list_covers_by_pid(pid: int) -> list[Cover]:
+    statement = select(Cover).where(Cover.picture_id == pid)
+    async with engine.new_session() as session:
+        session: AsyncSession = session
+        result = await session.execute(statement)
+        cover_list: list[Cover] = []
+        for cover in result.scalars().all():
+            cover_list.append(cover)
+        return cover_list
+
+
 async def count(options: GetCoverListOptions) -> int:
     """
     获取井盖列表的数量

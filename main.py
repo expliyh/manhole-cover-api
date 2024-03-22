@@ -10,8 +10,7 @@ from request_models.GetCoverListOptions import GetCoverListOptions
 
 from models import user_registry, engine
 
-import handlers.picture_handlers
-import handlers.cover_handlers
+from handlers import routers
 
 # Enable logging
 logging.basicConfig(
@@ -73,5 +72,6 @@ async def get_position_string(
 ):
     return {"message": "TODO: Return Position String"}
 
-app.include_router(handlers.picture_handlers.router)
-app.include_router(handlers.cover_handlers.router)
+
+for i in routers:
+    app.include_router(i)

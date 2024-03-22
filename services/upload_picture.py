@@ -21,7 +21,7 @@ async def upload_picture(
     picture_info.position_format = position_format
     picture_info.url = None
     picture_info.uploadTime = datetime.datetime.now()
-    # picture_info.upload_user = -1
+    picture_info.upload_user = None
     pid = await picture_registry.add_picture(picture_info)
     origin_name = picture.filename
     origin_ext = os.path.splitext(origin_name)[-1]
@@ -31,7 +31,7 @@ async def upload_picture(
     await picture_registry.update_url(pid, filename)
 
     task = asyncio.create_task(fake_recognize(pid, await picture.read()))
-
+    # await fake_recognize(pid, await picture.read())
     return {
         'status': 'success',
         'pid': pid,

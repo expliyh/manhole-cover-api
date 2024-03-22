@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from fastapi import UploadFile, APIRouter, HTTPException, File, Form
@@ -37,9 +38,19 @@ async def upload_picture_handler(
     )
 
 
-@router.post("/api/picture/get")
+@router.get("/api/picture/get")
 async def get_picture_handler(
         pid: int
 ):
+    if pid == -1:
+        return {
+            "pid": -1,
+            "pictureLink": 'picture.url',
+            "uploadTime": datetime.datetime.now(),
+            "recognizeTime": datetime.datetime.now(),
+            "uploadUser": -1,
+            "status": 'UPLOADED',
+            "result": '识别中'
+        }
     return await get_picture(pid)
     pass
