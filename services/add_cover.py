@@ -4,7 +4,7 @@ import datetime
 from fastapi import UploadFile
 
 import config
-from defines import PictureStatus
+from defines import PictureStatus, AuditStatus
 from models import Cover, picture_registry, cover_registry
 from models.engine import engine
 
@@ -17,7 +17,7 @@ async def add_cover(pid: int, file: bytes, status: str) -> int:
     cover.latitude = picture.latitude
     cover.longitude = picture.longitude
     cover.positionFormat = picture.position_format
-    cover.auditStatus = 'unchecked'
+    cover.auditStatus = AuditStatus.NOT_VIEWED
     cover.recognizeResult = status
     cover.uploadTime = picture.uploadTime
     cover.uploadUser = picture.upload_user
