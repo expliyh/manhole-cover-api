@@ -5,7 +5,7 @@ import numpy as np
 
 from recognize.Yolo import YoloV5ONNX
 
-CLASSES = ['good', 'broke', 'lose', 'uncovered', 'circle']
+CLASSES = ['井盖完好', '井盖破损', '井盖丢失', '井盖未盖', '井圈问题']
 
 
 # dets:  array [x,6] 6个值分别为x1,y1,x2,y2,score,class
@@ -137,25 +137,25 @@ def draw(image, box_data):
     return result, image
 
 
-def main(image_path):
-    onnx_path = 'best.onnx'
-    model = YoloV5ONNX(onnx_path)
+# def main(image_path):
+#     onnx_path = 'recognize/best.onnx'
+#     model = YoloV5ONNX(onnx_path)
+#
+#     output, or_img = model.inference(image_path)
+#
+#     outbox = filter_box(output, 0.5, 0.5)  # 最终剩下的Anchors：0 1 2 3 4 5 分别是 x1 y1 x2 y2 score class
+#
+#     if len(outbox) == 0:
+#         print('没有发现物体')
+#         sys.exit(0)
+#     result, or_img = draw(or_img, outbox)
+#
+#     return result, or_img
 
-    output, or_img = model.inference(image_path)
 
-    outbox = filter_box(output, 0.5, 0.5)  # 最终剩下的Anchors：0 1 2 3 4 5 分别是 x1 y1 x2 y2 score class
-
-    if len(outbox) == 0:
-        print('没有发现物体')
-        sys.exit(0)
-    result, or_img = draw(or_img, outbox)
-
-    return result, or_img
-
-
-if __name__ == "__main__":
-    result, img = main('IV`X(S)U8BNKIFTXI]$~(%C.jpg')
-
-    print(result)
-
-    cv2.imwrite('./res.jpg', img)
+# if __name__ == "__main__":
+#     result, img = main('IV`X(S)U8BNKIFTXI]$~(%C.jpg')
+#
+#     print(result)
+#
+#     cv2.imwrite('./res.jpg', img)
