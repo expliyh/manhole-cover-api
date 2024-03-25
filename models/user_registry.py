@@ -20,3 +20,11 @@ async def get_user_by_id(uid: int) -> User | None:
         result = await session.execute(select(User).where(User.id == uid))
         user = result.scalars().first()
         return user
+
+
+async def get_user_by_username(username: str) -> User | None:
+    async with engine.new_session() as session:
+        session: AsyncSession = session
+        result = await session.execute(select(User).where(User.username == username))
+        user = result.scalar()
+        return user
