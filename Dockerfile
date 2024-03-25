@@ -1,6 +1,6 @@
 FROM python:3.12-bookworm
 LABEL authors="Expliyh"
-RUN pip install poetry
+RUN pip install poetry && apt install cmake
 ADD . /workdir
 WORKDIR /workdir
 RUN poetry install --no-dev
