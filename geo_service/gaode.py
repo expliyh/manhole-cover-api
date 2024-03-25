@@ -18,11 +18,10 @@ class GaoDe:
                 result = await resp.json()
 
         return result['regeocode']['formatted_address']
-
-        # road_inters = result['regeocode']['roadinters']
-        # road_inters.sort(key=lambda x: x['distance'])
-        # if road_inters[0]['distance'] < 30:
-        #     return f""
+    # road_inters = result['regeocode']['roadinters']
+    # road_inters.sort(key=lambda x: x['distance'])
+    # if road_inters[0]['distance'] < 30:
+    #     return f""
 
 
 gaode = GaoDe()

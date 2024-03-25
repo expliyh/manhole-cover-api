@@ -27,7 +27,6 @@ async def get_cover_list(
     if not group.p_list_cover:
         raise HTTPException(status_code=403, detail="Permission denied")
     return await services.list_cover(options)
-    pass
 
 
 @router.post("/api/cover/edit")
@@ -38,4 +37,3 @@ async def edit_cover(option: EditCoverRequest):
 @router.get("/api/cover/get")
 async def get_cover(cid: int, token: Annotated[str | None, Header()] = None):
     return await services.get_cover(cid)
-    pass
