@@ -13,7 +13,8 @@ import config
 router = APIRouter()
 
 
-@router.post("/api/picture/add")
+@router.post("/api+"
+             "")
 async def upload_picture_handler(
         latitude: str = Form(),
         longitude: str = Form(),
