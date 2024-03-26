@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from request_models.GetCoverListOptions import *
+from request_models.GetCoverListOptions import GetCoverListOptions
 
 from .engine import engine
 from .Cover import Cover
@@ -90,4 +90,5 @@ async def update_url(cid: int, url: str):
     async with engine.new_session() as session:
         session: AsyncSession = session
         await session.execute(update(Cover).where(Cover.id == cid).values(url=url))
+        await session.commit()
     return

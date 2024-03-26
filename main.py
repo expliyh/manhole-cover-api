@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from request_models.GetCoverListOptions import GetCoverListOptions
 
+from recognize import yolo
+
 from models import user_registry, engine
 
 from handlers import routers
@@ -40,8 +42,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await engine.create_all()
+    yolo.init_model('recognize/best.onnx')
     yield
-    pass
 
 
 app = FastAPI(lifespan=lifespan)

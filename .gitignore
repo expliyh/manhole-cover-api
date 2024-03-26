@@ -1,1 +1,4 @@
 /covers/
+/**/*.onnx
+/.idea/sonarlint/
+/**/*sonarlint*

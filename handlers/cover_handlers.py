@@ -6,6 +6,7 @@ from config import get_uid_from_token
 from models.user_registry import get_user_by_id
 from models import group_registry
 from request_models.GetCoverListOptions import GetCoverListOptions
+from request_models.EditCoverRequest import EditCoverRequest
 import services
 
 router = APIRouter()
@@ -27,3 +28,12 @@ async def get_cover_list(
         raise HTTPException(status_code=403, detail="Permission denied")
     return await services.list_cover(options)
 
+
+@router.post("/api/cover/edit")
+async def edit_cover(option: EditCoverRequest):
+    return await services.edit_cover(option)
+
+
+@router.get("/api/cover/get")
+async def get_cover(cid: int, token: Annotated[str | None, Header()] = None):
+    return await services.get_cover(cid)

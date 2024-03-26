@@ -1,8 +1,8 @@
-from enum import Enum
-
-from sqlalchemy import Column, Integer, String, JSON, DateTime, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, JSON, DateTime, Text, ForeignKey, Enum
 
 from .ModelBase import model_base
+
+from defines import AuditStatus
 
 
 class Cover(model_base):
@@ -13,7 +13,7 @@ class Cover(model_base):
     longitude = Column(Integer)
     positionFormat = Column(Text, nullable=True)
     status = Column(String(32))
-    auditStatus = Column(String(32))
+    auditStatus = Column(Enum(AuditStatus), default=AuditStatus.NOT_VIEWED, nullable=False)
     recognizeResult = Column(String(16))
     correctedResult = Column(String(16), nullable=True)
     uploadTime = Column(DateTime)

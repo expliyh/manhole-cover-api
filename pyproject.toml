@@ -4,11 +4,12 @@ version = "0.1.0.00.001"
 description = ""
 authors = ["Expliyh <expliyh@outlook.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.110.0"
-uvicorn = "^0.28.0"
+uvicorn = "^0.29.0"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.28"}
 mariadb = "^1.1.9"
 asyncmy = "^0.2.9"
@@ -16,6 +17,9 @@ python-multipart = "^0.0.9"
 aiohttp = "^3.9.2"
 pyjwt = "^2.8.0"
 requests = "^2.31.0"
+opencv-python = "^4.9.0.80"
+onnx = "^1.15.0"
+onnxruntime = "^1.17.1"
 
 [[tool.poetry.source]]
 name = "torch"
