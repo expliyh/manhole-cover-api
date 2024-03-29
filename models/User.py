@@ -11,7 +11,7 @@ class User(model_base):
     username = Column(String(32))
     fullname = Column(String(64))
     password = Column(String(32))
-    refresh_token = Column(String(256))
+    refresh_token = Column(String(512))
     salt = Column(String(256))
     permissionOverride: dict = Column(JSON)
 
