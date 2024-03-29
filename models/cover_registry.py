@@ -39,14 +39,17 @@ async def list_covers(options: GetCoverListOptions) -> list[Cover]:
     statement = select(Cover)
     try:
         for filter_option in options.filter_by:
+            # if filter_option.field=="%ALL%":
+            #     statement = statement.where(getattr(Cover))
             statement = statement.where(getattr(Cover, filter_option.field) == filter_option.value)
         for sort_option in options.sort_by:
             statement = statement.order_by(
                 getattr(Cover, sort_option.field).asc() if sort_option.order == 'asc'
                 else getattr(Cover, sort_option.field).desc()
             )
-    except AttributeError:
-        raise HTTPException(status_code=400, detail='Invalid filter or sort option')
+    except AttributeError as ex:
+        raise ex
+        # raise HTTPException(status_code=400, detail='Invalid filter or sort option')
     statement = statement.offset(options.first).limit(options.rows_per_page)
     cover_list: list[Cover] = []
     async with engine.new_session() as session:

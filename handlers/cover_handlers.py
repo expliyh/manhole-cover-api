@@ -17,15 +17,15 @@ async def get_cover_list(
         options: GetCoverListOptions,
         token: Annotated[str | None, Header()] = None
 ):
-    if token is None:
-        raise HTTPException(status_code=401, detail="Authorization required")
-    if options.rows_per_page > 1000:
-        raise HTTPException(status_code=400, detail="Too many rows requested")
-    uid = get_uid_from_token(token)
-    user = await get_user_by_id(uid)
-    group = await group_registry.get_group_by_id(user.group_id)
-    if not group.p_list_cover:
-        raise HTTPException(status_code=403, detail="Permission denied")
+    # if token is None:
+    #     raise HTTPException(status_code=401, detail="Authorization required")
+    # if options.rows_per_page > 1000:
+    #     raise HTTPException(status_code=400, detail="Too many rows requested")
+    # uid = get_uid_from_token(token)
+    # user = await get_user_by_id(uid)
+    # group = await group_registry.get_group_by_id(user.group_id)
+    # if not group.p_list_cover:
+    #     raise HTTPException(status_code=403, detail="Permission denied")
     return await services.list_cover(options)
 
 
