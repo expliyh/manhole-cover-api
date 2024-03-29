@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "manhole-cover-api"
-version = "0.1.0.00.001"
+version = "0.1.0.00.002"
 description = ""
 authors = ["Expliyh <expliyh@outlook.com>"]
 readme = "README.md"

@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import HTTPException, Header, APIRouter
 
-from config import get_uid_from_token
+from token_utils import get_uid_from_token
 from models.user_registry import get_user_by_id
 from models import group_registry
 from request_models.GetCoverListOptions import GetCoverListOptions

@@ -9,7 +9,6 @@ from request_models.EditCoverRequest import EditCoverRequest
 
 async def edit_cover(option: EditCoverRequest):
     async with engine.new_session() as session:
-        session: AsyncSession = session
         cover: Cover | None = await session.get(Cover, option.cid)
         if cover is None:
             raise HTTPException(status_code=404, detail="Cover not found")
@@ -28,4 +27,3 @@ async def edit_cover(option: EditCoverRequest):
             cover.correctedResult = c_result
 
         await session.commit()
-        return

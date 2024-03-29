@@ -3,30 +3,45 @@ import datetime
 import os.path
 import threading
 
+import numpy as np
+
 import config
 import decimal
 from fastapi import UploadFile
+import cv2 as cv2
 
 from defines import PictureStatus
 from models import Picture, picture_registry
 from recognize import yolo
-from recognize.test3 import filter_box, draw
+from recognize.test3 import filter_box, get_result
 from .add_cover import fake_recognize, add_cover
 
 detect_tasks = set()
 
 
 async def det(pid: int, file: bytes):
-    output, or_img = yolo.inference(img_file=file)
+    output, _ = yolo.inference(img_file=file)
+
+    img = cv2.imdecode(np.frombuffer(file, np.uint8), cv2.IMREAD_COLOR)
+
+    height, width = img.shape[:2]
+
+    y_rito = height / 640
+    x_rito = width / 640
 
     outbox = filter_box(output, 0.5, 0.5)  # 最终剩下的Anchors：0 1 2 3 4 5 分别是 x1 y1 x2 y2 score class
 
-    result, or_img = draw(or_img, outbox)
+    result = get_result(outbox)
 
     for i in result:
-        await add_cover(pid, or_img, i[0])
+        top, left, right, bottom = i[2]
+        c_img = img.copy()
+        cv2.rectangle(c_img, (int(top * x_rito), int(left * y_rito), int(right * x_rito), int(bottom * y_rito)),
+                      (255, 0, 0), 10)
+        result, encoded_image = cv2.imencode('.webp', c_img)
+        await add_cover(pid, encoded_image.tobytes(), i[0])
 
-    await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)
+        await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)
 
 
 async def upload_picture(

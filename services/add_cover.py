@@ -28,10 +28,10 @@ async def add_cover(pid: int, file: bytes, status: str) -> int:
 
     cid = await engine.add(cover)
 
-    with open(f'{config.file_path}cover_{cid}.jpg', 'wb') as f:
+    with open(f'{config.file_path}cover_{cid}.webp', 'wb') as f:
         f.write(file)
 
-    await cover_registry.update_url(cid, f'cover_{cid}.jpg')
+    await cover_registry.update_url(cid, f'cover_{cid}.webp')
     return cid
 
 
@@ -39,4 +39,3 @@ async def fake_recognize(pid: int, file: bytes):
     await asyncio.sleep(5)
     cid = await add_cover(pid, file, "井盖完好")
     await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)
-    return

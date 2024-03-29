@@ -114,7 +114,7 @@ def filter_box(org_box, conf_thres, iou_thres):  # 过滤掉无用的框
     return output
 
 
-def draw(image, box_data):
+def get_result(box_data):
     # -------------------------------------------------------
     #	取整，方便画框
     # -------------------------------------------------------
@@ -125,17 +125,16 @@ def draw(image, box_data):
     result = []
     for box, score, cl in zip(boxes, scores, classes):
         result.append([CLASSES[cl], score, box])
-        top, left, right, bottom = box
+        # top, left, right, bottom = box
         # print('class: {}, score: {}'.format(CLASSES[cl], score))
         # print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(top, left, right, bottom))
 
-        cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2)
-        cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
-                    (top, left),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6, (0, 0, 255), 2)
-    return result, image
-
+        # cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2)
+        # cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
+        #             (top, left),
+        #             cv2.FONT_HERSHEY_SIMPLEX,
+        #             0.6, (0, 0, 255), 2)
+    return result
 
 # def main(image_path):
 #     onnx_path = 'recognize/best.onnx'
