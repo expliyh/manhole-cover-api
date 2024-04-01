@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, JSON, DateTime, Text, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, JSON, DateTime, Text, ForeignKey, Enum, DECIMAL
 
 from .ModelBase import model_base
 
@@ -9,8 +9,8 @@ class Cover(model_base):
     __tablename__ = 'covers'
     id = Column(Integer, primary_key=True)
     picture_id = Column(Integer, ForeignKey('pictures.id'))
-    latitude = Column(Integer)
-    longitude = Column(Integer)
+    latitude = Column(DECIMAL(9, 6))
+    longitude = Column(DECIMAL(9, 6))
     positionFormat = Column(Text, nullable=True)
     status = Column(String(32))
     auditStatus = Column(Enum(AuditStatus), default=AuditStatus.NOT_VIEWED, nullable=False)

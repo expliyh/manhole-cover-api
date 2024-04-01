@@ -43,6 +43,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     await engine.create_all()
     yolo.init_model('recognize/best.onnx')
+    await user_registry.check_default_user()
     yield
 
 
