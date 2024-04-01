@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func
 
 import token_utils
 from request_models import GetUserListOptions
@@ -62,20 +62,69 @@ async def list_users(options: GetUserListOptions) -> list[User]:
 
 async def add_user(username: str, password: str, groups: [str]) -> User:
     salt = token_utils.generate_random_string(32)
+    refresh_token = token_utils.generate_random_string(512)
     enc_pass = hash_password(password, salt)
     async with engine.new_session() as session:
-        user = User(username=username, password=enc_pass, groups=groups, salt=salt)
+        user = User(username=username, password=enc_pass, refresh_token=refresh_token, groups=groups, salt=salt)
         session.add(user)
         await session.commit()
         return user
 
 
+async def user_add_direct(user: User) -> User:
+    async with engine.new_session() as session:
+        session.add(user)
+        await session.commit()
+        return user
+
+
+async def count(options: GetUserListOptions) -> int:
+    """
+    获取井盖列表的数量
+    :param options: 获取井盖列表的选项
+    :return: 井盖列表的数量
+    """
+    statement = func.count(User.id)
+    try:
+        for filter_option in options.filter_by:
+            statement = statement.where(getattr(User, filter_option.field) == filter_option.value)
+    except AttributeError:
+        raise HTTPException(status_code=400, detail='Invalid filter option')
+    async with engine.new_session() as session:
+        result = await session.execute(statement)
+        return result.scalar()
+
+
+async def disable_user(uid: int) -> None:
+    async with engine.new_session() as session:
+        await session.execute(update(User).where(User.id == uid).values(disabled=True))
+        await session.commit()
+
+
+async def enable_user(uid: int) -> None:
+    async with engine.new_session() as session:
+        await session.execute(update(User).where(User.id == uid).values(disabled=False))
+        await session.commit()
+
+
 async def check_default_user() -> None:
+    salt = token_utils.generate_random_string(32)
+    refresh_token = token_utils.generate_random_string(512)
+    enc_pass = hash_password('admin', salt)
     async with engine.new_session() as session:
         result = await session.execute(select(User).where(User.username == 'admin'))
         user = result.scalars().first()
         if user is None:
-            await add_user('admin', 'admin', ['admin'])
+            default_admin = User(
+                username='admin',
+                password=enc_pass,
+                refresh_token=refresh_token,
+                email='admin@localhost',
+                phone='12345678901',
+                groups=['admin'],
+                salt=salt)
+            session.add(default_admin)
+            await session.commit()
             print('Default user added')
         else:
             print('Default user exists')

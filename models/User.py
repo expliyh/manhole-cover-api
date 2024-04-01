@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, JSON
+from sqlalchemy import Column, Integer, String, JSON, Boolean
 
 from .Group import Group
 from .ModelBase import model_base
@@ -11,9 +11,13 @@ class User(model_base):
     id = Column(Integer, primary_key=True)
     username = Column(String(32))
     fullname = Column(String(64), nullable=True)
+    email = Column(String(64), nullable=True)
+    phone = Column(String(11), nullable=True)
+    avatar = Column(String(2048), nullable=True)
     password = Column(String(512))
-    refresh_token = Column(String(512), nullable=True)
+    refresh_token = Column(String(512))
     groups: [str] = Column(JSON)
+    disabled = Column(Boolean, default=False)
     salt = Column(String(32))
 
     def __repr__(self):
