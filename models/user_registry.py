@@ -1,8 +1,10 @@
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy import select, update
 
 import token_utils
+from request_models import GetUserListOptions
 from token_utils import hash_password
 from .User import User
 from .engine import engine
@@ -27,6 +29,35 @@ async def get_user_by_username(username: str) -> User | None:
         result = await session.execute(select(User).where(User.username == username))
         user = result.scalar()
         return user
+
+
+async def list_users(options: GetUserListOptions) -> list[User]:
+    """
+    获取井盖列表
+    :param options: 获取井盖列表的选项
+    :return: 井盖列表
+    """
+    statement = select(User)
+    try:
+        for filter_option in options.filter_by:
+            # if filter_option.field=="%ALL%":
+            #     statement = statement.where(getattr(Cover))
+            statement = statement.where(getattr(User, filter_option.field) == filter_option.value)
+        for sort_option in options.sort_by:
+            statement = statement.order_by(
+                getattr(User, sort_option.field).asc() if sort_option.order == 'asc'
+                else getattr(User, sort_option.field).desc()
+            )
+    except AttributeError as _:
+        # raise ex
+        raise HTTPException(status_code=400, detail='Invalid filter or sort option')
+    statement = statement.offset(options.first).limit(options.rows_per_page)
+    user_list: list[User] = []
+    async with engine.new_session() as session:
+        result = await session.execute(statement)
+        for user in result.scalars().all():
+            user_list.append(user)
+    return user_list
 
 
 async def add_user(username: str, password: str, groups: [str]) -> User:
