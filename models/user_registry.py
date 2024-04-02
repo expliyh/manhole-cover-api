@@ -128,3 +128,19 @@ async def check_default_user() -> None:
             print('Default user added')
         else:
             print('Default user exists')
+
+
+async def reset_password(uid: int, new_password: str):
+    salt = token_utils.generate_random_string(32)
+    refresh_token = token_utils.generate_random_string(512)
+    enc_pass = hash_password(new_password, salt)
+    if uid <= 0:
+        raise HTTPException(status_code=400, detail="此用户不可被编辑")
+    async with engine.new_session() as session:
+        user: User | None = await session.get(uid)
+        if user is None:
+            raise HTTPException(status_code=404, detail="找不到用户")
+        user.refresh_token = refresh_token
+        user.salt = salt
+        user.password = enc_pass
+        await session.commit()

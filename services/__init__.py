@@ -6,4 +6,5 @@ from .get_cover import get_cover
 from .add_cover import add_cover
 from .list_user import list_user
 from .get_user import get_user
+from .reset_password import reset_password
 from . import file_service
