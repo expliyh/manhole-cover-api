@@ -74,9 +74,10 @@ async def edit_password(
         req: EditPasswordRequest,
         token: Annotated[str | None, Header()] = None
 ):
+    client_user = await user_registry.get_user_by_access_token(token)
+    if client_user is None:
+        raise HTTPException(status_code=401, detail="登录失效，请重试")
     if req.old_password is None:
-        client_uid = token_utils.get_uid_from_token(token)
-        client_user = await user_registry.get_user_by_id(client_uid)
         if 'admin' not in client_user.groups:
             raise HTTPException(status_code=401, detail="请输入旧密码")
     else:

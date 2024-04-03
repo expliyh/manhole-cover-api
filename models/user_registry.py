@@ -24,6 +24,16 @@ async def get_user_by_id(uid: int) -> User | None:
         return user
 
 
+async def get_user_by_access_token(token: str) -> User | None:
+    uid = token_utils.get_uid_from_token(token)
+    user = await get_user_by_id(uid)
+    if user is None:
+        return None
+    if not token_utils.verify_token(token, user.refresh_token):
+        return None
+    return user
+
+
 async def get_user_by_username(username: str) -> User | None:
     async with engine.new_session() as session:
         result = await session.execute(select(User).where(User.username == username))
