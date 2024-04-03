@@ -39,7 +39,7 @@ async def det(pid: int, file: bytes):
         cv2.rectangle(c_img, (int(top * x_rito), int(left * y_rito), int(right * x_rito), int(bottom * y_rito)),
                       (255, 0, 0), 10)
         result, encoded_image = cv2.imencode('.webp', c_img)
-        await add_cover(pid, encoded_image.tobytes(), i[0])
+        await add_cover(pid, encoded_image.tobytes(), i[0], i[1])
 
         await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)
 

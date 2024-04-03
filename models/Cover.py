@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, JSON, DateTime, Text, ForeignKey, Enum, DECIMAL
+from sqlalchemy import Column, Integer, String, JSON, DateTime, Text, ForeignKey, Enum, DECIMAL, Float
 
 from .ModelBase import model_base
 
@@ -20,6 +20,7 @@ class Cover(model_base):
     recognizeTime = Column(DateTime)
     uploadUser = Column(Integer, ForeignKey('users.id'))
     editCount = Column(Integer)
+    confidence = Column(Float)
     url = Column(Text, nullable=True)
 
     def __repr__(self):

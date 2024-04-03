@@ -5,7 +5,7 @@ from fastapi import APIRouter, Header, HTTPException
 import token_utils
 from models import user_registry
 import services
-from request_models import GetUserListOptions, UidRequest, EditPasswordRequest
+from request_models import GetUserListOptions, UidRequest, EditPasswordRequest, AddUserRequest
 
 router = APIRouter()
 
@@ -38,6 +38,19 @@ async def get_user(
     # if uid != uid:
     #     raise HTTPException(status_code=403, detail="Permission denied")
     return await services.get_user(uid)
+
+
+@router.post("api/user/add")
+async def add_user(
+        req: AddUserRequest,
+        token: Annotated[str | None, Header()] = None
+):
+    if token is None:
+        raise HTTPException(status_code=401, detail="请登录")
+    user = await user_registry.get_user_by_access_token(token)
+    if user is None:
+        raise HTTPException(status_code=401, detail="登录失效，请重试")
+
 
 
 @router.post("/api/user/edit/disable")

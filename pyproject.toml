@@ -20,6 +20,10 @@ requests = "^2.31.0"
 opencv-python = "^4.9.0.80"
 onnx = "^1.15.0"
 onnxruntime = "^1.17.1"
+torch = { version = "2.2.2", source="torch"}
+torchvision = { version = "0.17.2", source="torch"}
+ultralytics = "^8.1.42"
+
 
 [[tool.poetry.source]]
 name = "torch"
