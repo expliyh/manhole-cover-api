@@ -21,7 +21,7 @@ class User(model_base):
     disabled = Column(Boolean, default=False)
     salt = Column(String(32))
 
-    def auth(self, password)->bool:
+    def auth(self, password) -> bool:
         if self.password != token_utils.hash_password(password=password, salt=self.salt):
             return False
         else:
