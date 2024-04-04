@@ -8,3 +8,4 @@ from .list_user import list_user
 from .get_user import get_user
 from .reset_password import reset_password
 from . import file_service
+from .add_user import add_user

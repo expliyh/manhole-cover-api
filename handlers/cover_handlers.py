@@ -24,7 +24,7 @@ async def get_cover_list(
     user = await user_registry.get_user_by_access_token(token)
     if user is None:
         raise HTTPException(status_code=401, detail="登录失效，请重试")
-    if "admin" not in user.groups:
+    if "ADMIN" not in user.groups:
         raise HTTPException(status_code=403, detail="权限不足")
     return await services.list_cover(options)
 
@@ -39,7 +39,7 @@ async def edit_cover(
     user = await user_registry.get_user_by_access_token(token)
     if user is None:
         raise HTTPException(status_code=401, detail="登录失效，请重试")
-    if "admin" not in user.groups:
+    if "ADMIN" not in user.groups:
         raise HTTPException(status_code=403, detail="权限不足")
     return await services.edit_cover(option)
 

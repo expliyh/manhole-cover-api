@@ -9,5 +9,5 @@ class AddUserRequest(BaseModel):
     phone: str
     avatar: str
     disabled: bool
-    group: [str]
+    group: list
     password: str

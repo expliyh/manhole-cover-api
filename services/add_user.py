@@ -13,6 +13,10 @@ async def add_user(req: request_models.AddUserRequest):
         raise HTTPException(status_code=400, detail="已存在 UID 相同的用户")
     if await user_registry.get_user_by_username(req.username) is not None:
         raise HTTPException(status_code=400, detail="已存在用户名相同的用户")
+    if await user_registry.get_user_by_email(req.email) is not None:
+        raise HTTPException(status_code=400, detail="已存在电子邮件地址相同的用户")
+    if await user_registry.get_user_by_phone(req.phone) is not None:
+        raise HTTPException(status_code=400, detail="已存在手机号码相同的用户")
     if len(req.password) < 8:
         raise HTTPException(status_code=404, detail="密码太短")
     if (not re.search(r"\d", req.password) or

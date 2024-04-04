@@ -10,10 +10,10 @@ from .ModelBase import model_base
 class User(model_base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    username = Column(String(32))
+    username = Column(String(32), index=True)
     fullname = Column(String(64), nullable=True)
-    email = Column(String(64), nullable=True)
-    phone = Column(String(11), nullable=True)
+    email = Column(String(64), nullable=True, index=True)
+    phone = Column(String(11), nullable=True, index=True)
     avatar = Column(String(2048), nullable=True)
     password = Column(String(512))
     refresh_token = Column(String(512))

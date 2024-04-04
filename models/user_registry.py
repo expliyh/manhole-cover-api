@@ -34,10 +34,24 @@ async def get_user_by_access_token(token: str) -> User | None:
     return user
 
 
+async def get_user_by_email(email: str) -> User | None:
+    async with engine.new_session() as session:
+        result = await session.execute(select(User).where(User.email == email))
+        user = result.scalars().first()
+        return user
+
+
 async def get_user_by_username(username: str) -> User | None:
     async with engine.new_session() as session:
         result = await session.execute(select(User).where(User.username == username))
         user = result.scalar()
+        return user
+
+
+async def get_user_by_phone(phone: str) -> User | None:
+    async with engine.new_session() as session:
+        result = await session.execute(select(User).where(User.phone == phone))
+        user = result.scalars().first()
         return user
 
 
@@ -131,7 +145,7 @@ async def check_default_user() -> None:
                 refresh_token=refresh_token,
                 email='admin@localhost',
                 phone='12345678901',
-                groups=['admin'],
+                groups=['ADMIN'],
                 salt=salt)
             session.add(default_admin)
             await session.commit()

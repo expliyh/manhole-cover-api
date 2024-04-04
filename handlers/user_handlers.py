@@ -40,7 +40,7 @@ async def get_user(
     return await services.get_user(uid)
 
 
-@router.post("api/user/add")
+@router.post("/api/user/add")
 async def add_user(
         req: AddUserRequest,
         token: Annotated[str | None, Header()] = None
@@ -50,7 +50,7 @@ async def add_user(
     user = await user_registry.get_user_by_access_token(token)
     if user is None:
         raise HTTPException(status_code=401, detail="登录失效，请重试")
-
+    await services.add_user(req)
 
 
 @router.post("/api/user/edit/disable")
