@@ -1,13 +1,15 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy import select, update, func
 
 import token_utils
 from request_models import GetUserListOptions
 from token_utils import hash_password
-from .User import User
+from .User import User, _create_user
 from .engine import engine
+from .default_users_strict import default_users_strict
 
 
 async def get_refresh_token(uid: int) -> str | None:
@@ -61,7 +63,7 @@ async def list_users(options: GetUserListOptions) -> list[User]:
     :param options: 获取井盖列表的选项
     :return: 井盖列表
     """
-    statement = select(User)
+    statement = select(User).where(User.id > 99)
     try:
         for filter_option in options.filter_by:
             # if filter_option.field=="%ALL%":
@@ -95,7 +97,16 @@ async def add_user(username: str, password: str, groups: [str]) -> User:
         return user
 
 
-async def user_add_direct(user: User) -> User:
+async def delete_user(uid: int):
+    async with engine.new_session() as session:
+        to_delete = await session.get(User, uid)
+        await session.delete(to_delete)
+        await session.commit()
+
+
+async def user_add_direct(user: User, no_check=False) -> User:
+    if user.id < 100 and not no_check:
+        raise HTTPException(status_code=400, detail="用户 ID 无效")
     async with engine.new_session() as session:
         session.add(user)
         await session.commit()
@@ -108,15 +119,19 @@ async def count(options: GetUserListOptions) -> int:
     :param options: 获取井盖列表的选项
     :return: 井盖列表的数量
     """
-    statement = func.count(User.id)
+    # 注意：确保这里的 func.count() 用法是正确的，首先构建一个 select 语句
+    statement = select(func.count()).select_from(User).filter(User.id > 99)
+
     try:
         for filter_option in options.filter_by:
-            statement = statement.where(getattr(User, filter_option.field) == filter_option.value)
+            statement = statement.filter(getattr(User, filter_option.field) == filter_option.value)
     except AttributeError:
         raise HTTPException(status_code=400, detail='Invalid filter option')
-    async with engine.new_session() as session:
-        result = await session.execute(statement)
-        return result.scalar()
+
+    async with engine.new_session() as conn:  # 使用 begin() 以自动处理事务
+        result = await conn.execute(statement)
+        count_result = result.scalar()
+        return count_result if count_result is not None else 0
 
 
 async def disable_user(uid: int) -> None:
@@ -140,6 +155,7 @@ async def check_default_user() -> None:
         user = result.scalars().first()
         if user is None:
             default_admin = User(
+                id=100,
                 username='admin',
                 password=enc_pass,
                 refresh_token=refresh_token,
@@ -149,9 +165,21 @@ async def check_default_user() -> None:
                 salt=salt)
             session.add(default_admin)
             await session.commit()
-            print('Default user added')
+            print('Default admin added')
         else:
-            print('Default user exists')
+            print('Default admin exists')
+
+    for i in default_users_strict:
+        d_user = await get_user_by_id(i.id)
+        if d_user is None:
+            try:
+                await user_add_direct(i, True)
+                continue
+            except IntegrityError:
+                raise RuntimeError("启动失败：系统关键保留用户被占用")
+        else:
+            if not d_user.is_same(i):
+                raise RuntimeError("启动失败：系统关键保留用户被占用")
 
 
 async def reset_password(uid: int, new_password: str):

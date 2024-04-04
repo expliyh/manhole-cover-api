@@ -30,6 +30,13 @@ async def get_cover(cid: int) -> Cover | None:
         return cover
 
 
+async def get_list_by_uid(uid: int) -> list[Cover]:
+    async with engine.new_session() as session:
+        statement = select(Cover).where(Cover.uploadUser == uid)
+        result = await session.execute(statement)
+        return result.scalars().all()
+
+
 async def list_covers(options: GetCoverListOptions) -> list[Cover]:
     """
     获取井盖列表
@@ -58,6 +65,13 @@ async def list_covers(options: GetCoverListOptions) -> list[Cover]:
         for cover in result.scalars().all():
             cover_list.append(cover)
     return cover_list
+
+
+async def reset_upload_user(old_uid: int, new_uid: int):
+    statement = update(Cover).where(Cover.uploadUser == old_uid).values(uploadUser=new_uid)
+    async with engine.new_session() as session:
+        await session.execute(statement)
+        await session.commit()
 
 
 async def list_covers_by_pid(pid: int) -> list[Cover]:

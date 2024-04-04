@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, select, func, text
 
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -16,19 +16,17 @@ class Engine:
             "mariadb+asyncmy://dbcover:CG8k4s8XAzkWtPPC@db.irminsul.top:3306/dbcover",
 
         )
-        pass
 
     async def create_all(self):
         async with self.eg.begin() as conn:
-            conn: AsyncConnection = conn
             await conn.run_sync(model_base.metadata.create_all)
+        # await self.set_autoincrement_start('users')
 
     def new_session(self) -> AsyncSession:
         return async_sessionmaker(self.eg, expire_on_commit=True)()
 
     async def add(self, obj) -> int:
         async with async_sessionmaker(self.eg, expire_on_commit=False)() as session:
-            session: AsyncSession = session
             session.add(obj)
             await session.commit()
             oid = obj.id

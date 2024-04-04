@@ -5,7 +5,7 @@ from fastapi import APIRouter, Header, HTTPException
 import token_utils
 from models import user_registry
 import services
-from request_models import GetUserListOptions, UidRequest, EditPasswordRequest, AddUserRequest
+from request_models import GetUserListOptions, UidRequest, EditPasswordRequest, AddUserRequest, DeleteUserRequest
 
 router = APIRouter()
 
@@ -50,7 +50,24 @@ async def add_user(
     user = await user_registry.get_user_by_access_token(token)
     if user is None:
         raise HTTPException(status_code=401, detail="登录失效，请重试")
+    if 'ADMIN' not in user.groups:
+        raise HTTPException(status_code=403, detail="权限不足")
     await services.add_user(req)
+
+
+@router.post('/api/user/delete')
+async def delete_user(
+        req: DeleteUserRequest,
+        token: Annotated[str | None, Header()] = None
+):
+    if token is None:
+        raise HTTPException(status_code=401, detail="请登录")
+    user = await user_registry.get_user_by_access_token(token)
+    if user is None:
+        raise HTTPException(status_code=401, detail="登录失效，请重试")
+    if 'ADMIN' not in user.groups:
+        raise HTTPException(status_code=403, detail="权限不足")
+    return await services.delete_user(req)
 
 
 @router.post("/api/user/edit/disable")
