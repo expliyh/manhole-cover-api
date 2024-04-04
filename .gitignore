@@ -2,3 +2,4 @@
 /**/*.onnx
 /.idea/sonarlint/
 /**/*sonarlint*
+/recognize/best.pt

@@ -10,5 +10,8 @@ async def det(pid: int, file: bytes):
 
     result, or_img = get_result(outbox)
 
-    await add_cover(pid, or_img, result[0][0])
+    await add_cover(pid, or_img, result[0][0], 0.0)
 
+
+def detect(image: bytes):
+    pass

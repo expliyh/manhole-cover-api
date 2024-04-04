@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from models import user_registry, User
-from request_models import UserResponse
+from request_models import UserResponse, LoginRequest
 from token_utils import hash_password, generate_token
 
 login_router = APIRouter()
@@ -8,14 +8,12 @@ login_router = APIRouter()
 
 @login_router.post('/api/login')
 async def login(
-        username: str,
-        password: str
+        req: LoginRequest
 ):
-    user: User = await user_registry.get_user_by_username(username)
+    user: User = await user_registry.get_user_by_username(req.username)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    password_secure = hash_password(password)
-    if user.password != password_secure:
+    if not user.auth(req.password):
         raise HTTPException(status_code=403, detail="Password incorrect")
     user_response = UserResponse(
         username=user.username,

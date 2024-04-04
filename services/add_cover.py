@@ -9,7 +9,7 @@ from models import Cover, picture_registry, cover_registry
 from models.engine import engine
 
 
-async def add_cover(pid: int, file: bytes, status: str) -> int:
+async def add_cover(pid: int, file: bytes, status: str, confidence: float) -> int:
     cover = Cover()
     cover.picture_id = pid
     cover.status = status
@@ -25,6 +25,7 @@ async def add_cover(pid: int, file: bytes, status: str) -> int:
     cover.recognizeTime = datetime.datetime.now()
     cover.editCount = 0
     cover.url = None
+    cover.confidence = confidence
 
     cid = await engine.add(cover)
 
