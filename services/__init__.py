@@ -9,3 +9,4 @@ from .get_user import get_user
 from .reset_password import reset_password
 from . import file_service
 from .add_user import add_user
+from .delete_user import delete_user

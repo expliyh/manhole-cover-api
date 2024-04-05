@@ -14,3 +14,13 @@ async def get_file_query(filename: str):
 @file_router.get('/api/file/{filename}')
 async def get_file_path(filename: str):
     return FileResponse(file_service.getter.get_path(filename))
+
+
+@file_router.get('/api/download/{filename}')
+async def download(filename: str):
+    path, name = file_service.getter.get_path_and_name(filename)
+    return FileResponse(
+        path,
+        headers={
+            "Content-Disposition": "attachment; filename={}".format(name)
+        })
