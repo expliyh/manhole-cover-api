@@ -1,9 +1,9 @@
 FROM python:3.12-bookworm
 LABEL authors="Expliyh"
-RUN pip install poetry && apt-get update && apt-get install cmake -y && apt-get clean
+RUN apt-get update && apt-get install cmake -y && apt-get clean
 ADD . /workdir
 WORKDIR /workdir
-RUN poetry install --no-dev
+RUN pip install -r requirements.txt
 ENV DATABASE_HOST=mariadb
 ENV DATABASE_PORT=3306
 ENV DATABASE_NAME=your_database_name
