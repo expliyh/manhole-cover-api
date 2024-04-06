@@ -1,6 +1,6 @@
 FROM python:3.12-bookworm
 LABEL authors="Expliyh"
-RUN apt-get update && apt-get install cmake -y && apt-get clean
+RUN apt-get update && apt-get install cmake ffmpeg libsm6 libxext6 libgl1 -y && apt-get clean
 ADD . /workdir
 WORKDIR /workdir
 RUN pip install -r requirements.txt
