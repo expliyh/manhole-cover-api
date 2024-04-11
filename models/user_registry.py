@@ -113,6 +113,15 @@ async def user_add_direct(user: User, no_check=False) -> User:
         return user
 
 
+async def merge(user: User, no_check=False) -> User:
+    if user.id < 100 and not no_check:
+        raise HTTPException(status_code=400, detail="用户 ID 无效")
+    async with engine.new_session() as session:
+        await session.merge(user)
+        await session.commit()
+        return user
+
+
 async def count(options: GetUserListOptions) -> int:
     """
     获取井盖列表的数量
