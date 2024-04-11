@@ -7,3 +7,4 @@ from .LoginRequest import LoginRequest
 from .AddUserRequest import AddUserRequest
 from .GetCoverListOptions import GetCoverListOptions
 from .DeleteUserRequest import DeleteUserRequest
+from .UserEditRequest import UserEditRequest

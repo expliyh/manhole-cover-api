@@ -5,7 +5,8 @@ from fastapi import APIRouter, Header, HTTPException
 import token_utils
 from models import user_registry
 import services
-from request_models import GetUserListOptions, UidRequest, EditPasswordRequest, AddUserRequest, DeleteUserRequest
+from request_models import GetUserListOptions, UidRequest, EditPasswordRequest, AddUserRequest, DeleteUserRequest, \
+    UserEditRequest
 
 router = APIRouter()
 
@@ -97,6 +98,22 @@ async def enable_user(
     # print(req)
     await user_registry.enable_user(req.uid)
     return {"status": "success"}
+
+
+@router.post("/api/user/edit")
+async def edit_user(
+        req: UserEditRequest,
+        token: Annotated[str | None, Header()] = None
+
+):
+    if token is None:
+        raise HTTPException(status_code=401, detail="Authorization required")
+    client_user = await user_registry.get_user_by_access_token(token)
+    if client_user is None:
+        raise HTTPException(status_code=401, detail="登录失效，请重试")
+    if req.uid is not None and 'ADMIN' not in client_user.groups:
+        raise HTTPException(status_code=403, detail="权限不足")
+    await services.edit_user(req, client_user.id if req.uid is None else None)
 
 
 @router.post("/api/user/edit/password")
