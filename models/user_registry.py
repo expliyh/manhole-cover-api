@@ -117,7 +117,7 @@ async def merge(user: User, no_check=False) -> User:
     if user.id < 100 and not no_check:
         raise HTTPException(status_code=400, detail="用户 ID 无效")
     async with engine.new_session() as session:
-        session.merge(user)
+        await session.merge(user)
         await session.commit()
         return user
 

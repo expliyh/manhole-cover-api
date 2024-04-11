@@ -113,7 +113,7 @@ async def edit_user(
         raise HTTPException(status_code=401, detail="登录失效，请重试")
     if req.uid is not None and 'ADMIN' not in client_user.groups:
         raise HTTPException(status_code=403, detail="权限不足")
-    await services.edit_user(req, client_user.id if req.uid is None else None)
+    return await services.edit_user(req, client_user.id if req.uid is None else None)
 
 
 @router.post("/api/user/edit/password")
