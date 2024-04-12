@@ -19,6 +19,7 @@ class Cover(model_base):
     uploadTime = Column(DateTime)
     recognizeTime = Column(DateTime)
     uploadUser = Column(Integer, ForeignKey('users.id'))
+    ticketSentTo = Column(Integer, ForeignKey('users.id'))
     editCount = Column(Integer)
     confidence = Column(Float)
     url = Column(Text, nullable=True)
