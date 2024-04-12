@@ -8,3 +8,4 @@ from .AddUserRequest import AddUserRequest
 from .GetCoverListOptions import GetCoverListOptions
 from .DeleteUserRequest import DeleteUserRequest
 from .UserEditRequest import UserEditRequest
+from .CreateTicketRequest import CreateTicketRequest
