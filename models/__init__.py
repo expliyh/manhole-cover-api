@@ -7,5 +7,6 @@ from .engine import Engine, engine
 from . import (
     picture_registry,
     user_registry,
-    group_registry
+    group_registry,
+    statistics
 )
