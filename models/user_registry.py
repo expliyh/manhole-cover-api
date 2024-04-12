@@ -68,7 +68,10 @@ async def list_users(options: GetUserListOptions) -> list[User]:
         for filter_option in options.filter_by:
             # if filter_option.field=="%ALL%":
             #     statement = statement.where(getattr(Cover))
-            statement = statement.where(getattr(User, filter_option.field) == filter_option.value)
+            if filter_option.match_mode == 'include':
+                statement = statement.where(getattr(User, filter_option.field).ilike(f'%{filter_option.value}%'))
+            else:
+                statement = statement.where(getattr(User, filter_option.field) == filter_option.value)
         for sort_option in options.sort_by:
             statement = statement.order_by(
                 getattr(User, sort_option.field).asc() if sort_option.order == 'asc'

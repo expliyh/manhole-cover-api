@@ -1,27 +1,8 @@
-import cv2
-import numpy as np
-import onnx
 import onnxruntime
-import onnxruntime as ort
 import torch
 import torchvision
-
-
-class Colors:
-    def __init__(self):
-        # hex = matplotlib.colors.TABLEAU_COLORS.values()
-        hexs = ('FF3838', 'FF9D97', 'FF701F', 'FFB21D', 'CFD231', '48F90A', '92CC17', '3DDB86', '1A9334', '00D4BB',
-                '2C99A8', '00C2FF', '344593', '6473FF', '0018EC', '8438FF', '520085', 'CB38FF', 'FF95C8', 'FF37C7')
-        self.palette = [self.hex2rgb(f'#{c}') for c in hexs]
-        self.n = len(self.palette)
-
-    def __call__(self, i, bgr=False):
-        c = self.palette[int(i) % self.n]
-        return (c[2], c[1], c[0]) if bgr else c
-
-    @staticmethod
-    def hex2rgb(h):  # rgb order (PIL)
-        return tuple(int(h[1 + i:1 + i + 2], 16) for i in (0, 2, 4))
+import cv2
+import numpy as np
 
 
 class Annotator:
@@ -61,6 +42,29 @@ class Annotator:
     def result(self):
         # Return annotated image as array
         return np.asarray(self.im)
+
+
+class Colors:
+    def __init__(self):
+        # hex = matplotlib.colors.TABLEAU_COLORS.values()
+        hexs = ('FF3838', 'FF9D97', 'FF701F', 'FFB21D', 'CFD231', '48F90A', '92CC17', '3DDB86', '1A9334', '00D4BB',
+                '2C99A8', '00C2FF', '344593', '6473FF', '0018EC', '8438FF', '520085', 'CB38FF', 'FF95C8', 'FF37C7')
+        self.palette = [self.hex2rgb(f'#{c}') for c in hexs]
+        self.n = len(self.palette)
+
+    def __call__(self, i, bgr=False):
+        c = self.palette[int(i) % self.n]
+        return (c[2], c[1], c[0]) if bgr else c
+
+    @staticmethod
+    def hex2rgb(h):  # rgb order (PIL)
+        return tuple(int(h[1 + i:1 + i + 2], 16) for i in (0, 2, 4))
+
+
+def Loadmodel(w='best.onnx'):
+    providers = ['CPUExecutionProvider']
+    session = onnxruntime.InferenceSession(w, providers=providers)
+    return session
 
 
 def letterbox(im, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
@@ -208,68 +212,45 @@ def clip_coords(boxes, shape):
         boxes[:, [1, 3]] = boxes[:, [1, 3]].clip(0, shape[0])  # y1, y2
 
 
-class YoloV5ONNX(object):
-    def __init__(self):
-        self.onnx_session = None
-        self.input_name = None
-        self.output_name = None
+def run(source="test.jpg", session=None):
+    colors = Colors()  # create instance for 'from utils.plots import colors'
+    img0 = cv2.imread(source)
+    img = letterbox(img0, (640, 640), stride=32, auto=False)  # only pt use auto=True, but we are onnx
+    img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
+    img = np.ascontiguousarray(img)
+    im = torch.from_numpy(img).to(torch.device('cpu'))
+    im = im.float()
+    im /= 255  # 0 - 255 to 0.0 - 1.0
+    if len(im.shape) == 3:
+        im = im[None]  # expand for batch dim
+    im = im.cpu().numpy()  # torch to numpy
 
-    def load_model(self, w='best.onnx'):
-        providers = ['CPUExecutionProvider']
-        session = onnxruntime.InferenceSession(w, providers=providers)
-        self.onnx_session = session
+    y = session.run([session.get_outputs()[0].name], {session.get_inputs()[0].name: im})[
+        0]  # inference onnx model to get the total output
+    # non_max_suppression to remove redundant boxes
+    y = torch.from_numpy(y).to(torch.device('cpu'))
+    pred = non_max_suppression(y, conf_thres=0.25, iou_thres=0.45, agnostic=False, max_det=1000)
+    # transform coordinate to original picutre size
+    for i, det in enumerate(pred):
+        det[:, :4] = scale_coords(im.shape[2:], det[:, :4], img0.shape).round()
 
-    def init_model(self, onnx_path):
-        """检查onnx模型并初始化onnx"""
-        # onnx_model = onnx.load(onnx_path)
-        try:
-            self.load_model(w=onnx_path)
-        except Exception:
-            print("Model incorrect")
-        else:
-            print("Model correct")
-
-        options = ort.SessionOptions()
-        options.enable_profiling = True
-        # self.input_name = self.get_input_name()  # ['images']
-        # self.output_name = self.get_output_name()  # ['output0']
-
-    def run(self, image):
-        colors = Colors()  # create instance for 'from utils.plots import colors'
-        img = letterbox(image, (640, 640), stride=32, auto=False)  # only pt use auto=True, but we are onnx
-        img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
-        img = np.ascontiguousarray(img)
-        im = torch.from_numpy(img).to(torch.device('cpu'))
-        im = im.float()
-        im /= 255  # 0 - 255 to 0.0 - 1.0
-        if len(im.shape) == 3:
-            im = im[None]  # expand for batch dim
-        im = im.cpu().numpy()  # torch to numpy
-
-        y = \
-            self.onnx_session.run([self.onnx_session.get_outputs()[0].name],
-                                  {self.onnx_session.get_inputs()[0].name: im})[0]
-        # inference onnx model to get the total output
-        # non_max_suppression to remove redundant boxes
-        y = torch.from_numpy(y).to(torch.device('cpu'))
-        pred = non_max_suppression(y, conf_thres=0.25, iou_thres=0.45, agnostic=False, max_det=1000)
-        # transform coordinate to original picutre size
-        for i, det in enumerate(pred):
-            det[:, :4] = scale_coords(im.shape[2:], det[:, :4], image.shape).round()
-
-        # labels
-        names = ['good', 'broke', 'lose', 'uncovered', 'circle']
-        # initialize annotator
-        annotator = Annotator(image, line_width=3)
-        # annotate the image
-        result = []
-        for *xyxy, conf, cls in reversed(det):
-            c = int(cls)  # integer class
-            label = f'{names[c]} {conf:.2f}'
-            annotator.box_label(xyxy, label, color=colors(c, True))
-            result.append([names[c], conf.item(), [i.item() for i in xyxy]])
-        # save the image
-        return image, result
+    # labels
+    names = ['good', 'broke', 'lose', 'uncovered', 'circle']
+    # initialize annotator
+    annotator = Annotator(img0, line_width=3)
+    # annotate the image
+    result = []
+    for *xyxy, conf, cls in reversed(det):
+        c = int(cls)  # integer class
+        label = f'{names[c]} {conf:.2f}'
+        annotator.box_label(xyxy, label, color=colors(c, True))
+        result.append([names[c], conf.item(), [i.item() for i in xyxy]])
+    # save the image
+    return img0, result
 
 
-yolo = YoloV5ONNX()
+if __name__ == "__main__":
+    model = Loadmodel(w='best.onnx')
+    im, result = run(source="test.jpg", session=Loadmodel(w='best.onnx'))
+    print(result)
+    cv2.imwrite("test_cpu.png", im)

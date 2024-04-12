@@ -3,6 +3,7 @@ from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from request_models.GetCoverListOptions import GetCoverListOptions
+from defines import AuditStatus
 
 from .engine import engine
 from .Cover import Cover
@@ -107,5 +108,16 @@ async def update_url(cid: int, url: str):
     async with engine.new_session() as session:
         session: AsyncSession = session
         await session.execute(update(Cover).where(Cover.id == cid).values(url=url))
+        await session.commit()
+    return
+
+
+async def set_ticket(cid: int, engineer: int):
+    async with engine.new_session() as session:
+        cover = await session.get(Cover, cid)
+        if cover is None:
+            raise HTTPException(status_code=404, detail='Cover not found')
+        cover.ticketSentTo = engineer
+        cover.auditStatus = AuditStatus.SENT_TICKET
         await session.commit()
     return
