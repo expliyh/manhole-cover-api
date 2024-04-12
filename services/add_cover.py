@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import logging
 
 from fastapi import UploadFile
 
@@ -7,6 +8,8 @@ import config
 from defines import PictureStatus, AuditStatus
 from models import Cover, picture_registry, cover_registry
 from models.engine import engine
+
+logger = logging.getLogger(__name__)
 
 
 async def add_cover(pid: int, file: bytes, status: str, confidence: float) -> int:
@@ -32,11 +35,12 @@ async def add_cover(pid: int, file: bytes, status: str, confidence: float) -> in
     with open(f'{config.file_path}cover_{cid}.webp', 'wb') as f:
         f.write(file)
 
+    logger.info("New cover added, cid: %s, status: %s" % (cid, status))
+
     await cover_registry.update_url(cid, f'cover_{cid}.webp')
     return cid
 
-
-async def fake_recognize(pid: int, file: bytes):
-    await asyncio.sleep(5)
-    cid = await add_cover(pid, file, "井盖完好")
-    await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)
+# async def fake_recognize(pid: int, file: bytes):
+#     await asyncio.sleep(5)
+#     cid = await add_cover(pid, file, "井盖完好")
+#     await picture_registry.update_status(pid, PictureStatus.RECOGNIZED)

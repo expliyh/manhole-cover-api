@@ -14,28 +14,30 @@ from defines import PictureStatus
 from models import Picture, picture_registry
 from recognize import yolo
 from recognize.test3 import filter_box, get_result
-from .add_cover import fake_recognize, add_cover
+from .add_cover import add_cover
 
 detect_tasks = set()
 
 
 async def det(pid: int, file: bytes):
-    output, _ = yolo.inference(img_file=file)
-
     img = cv2.imdecode(np.frombuffer(file, np.uint8), cv2.IMREAD_COLOR)
 
-    height, width = img.shape[:2]
+    _, result = yolo.run(img)
 
-    y_rito = height / 640
-    x_rito = width / 640
+    img1 = cv2.imdecode(np.frombuffer(file, np.uint8), cv2.IMREAD_COLOR)
+    height, width = img1.shape[:2]
+    # y_rito = height / 640
+    # x_rito = width / 640
+    y_rito = 1
+    x_rito = 1
 
-    outbox = filter_box(output, 0.5, 0.5)  # 最终剩下的Anchors：0 1 2 3 4 5 分别是 x1 y1 x2 y2 score class
-
-    result = get_result(outbox)
+    # outbox = filter_box(output, 0.5, 0.5)  # 最终剩下的Anchors：0 1 2 3 4 5 分别是 x1 y1 x2 y2 score class
+    #
+    # result = get_result(outbox)
 
     for i in result:
         top, left, right, bottom = i[2]
-        c_img = img.copy()
+        c_img = img1.copy()
         cv2.rectangle(c_img, (int(top * x_rito), int(left * y_rito), int(right * x_rito), int(bottom * y_rito)),
                       (255, 0, 0), 10)
         result, encoded_image = cv2.imencode('.webp', c_img)
@@ -48,7 +50,8 @@ async def upload_picture(
         latitude: decimal.Decimal,
         longitude: decimal.Decimal,
         position_format: str,
-        picture: UploadFile
+        picture: UploadFile,
+        uid: int
 ):
     picture_info = Picture()
     picture_info.latitude = latitude
@@ -56,7 +59,7 @@ async def upload_picture(
     picture_info.position_format = position_format
     picture_info.url = None
     picture_info.uploadTime = datetime.datetime.now()
-    picture_info.upload_user = None
+    picture_info.upload_user = uid
     pid = await picture_registry.add_picture(picture_info)
     origin_name = picture.filename
     origin_ext = os.path.splitext(origin_name)[-1]
